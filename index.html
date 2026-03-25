@@ -7,6 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -71,7 +72,7 @@
         .nav-btn {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
+            transform: translateY(-50%); 
             background: rgba(255,255,255,0.7);
             border: none;
             width: 35px;
@@ -91,7 +92,7 @@
         .prev-btn { left: -50px; } 
         .next-btn { right: -50px; } 
 
-        /* --- TARJETA DEL TIEMPO --- */
+        /* --- TARJETA DINÁMICA (TIEMPO / REDES) --- */
         .weather-card {
             position: absolute;
             bottom: 30px;
@@ -102,15 +103,34 @@
             border-radius: 20px;
             box-shadow: var(--sombra);
             z-index: 1000;
-            display: flex;
+            border: 1px solid rgba(255,255,255,0.3);
+            min-width: 180px;
+            height: 70px;
+            overflow: hidden;
+        }
+
+        /* Contenido interno del widget */
+        .widget-content {
+            display: none; /* Oculto por defecto */
             align-items: center;
             gap: 15px;
-            border: 1px solid rgba(255,255,255,0.3);
+            height: 100%;
+            animation: fadeIn 0.6s ease;
         }
-        .weather-icon { font-size: 32px; }
-        .weather-data { display: flex; flex-direction: column; }
-        .weather-temp { font-size: 20px; font-weight: 700; color: #2d2d2d; }
-        .weather-details { display: flex; gap: 12px; font-size: 11px; color: #555; font-weight: 600; margin-top: 2px; }
+
+        .widget-content.active-widget {
+            display: flex; /* Se muestra el que tenga esta clase */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .weather-icon { font-size: 32px; display: flex; align-items: center; justify-content: center; }
+        .weather-data { display: flex; flex-direction: column; justify-content: center;}
+        .weather-temp { font-size: 20px; font-weight: 700; color: #2d2d2d; line-height: 1.1; }
+        .weather-details { display: flex; gap: 12px; font-size: 11px; color: #555; font-weight: 600; margin-top: 4px; }
         .detail-item { display: flex; align-items: center; gap: 4px; }
 
         /* --- CLASE PARA EL ICONO FIJO --- */
@@ -124,8 +144,9 @@
         /* RESPONSIVE MÓVIL */
         @media (max-width: 600px) {
             .weather-card { left: 20px; right: 20px; bottom: 20px; justify-content: center; }
+            .widget-content { justify-content: center; }
             .cards-container { width: 90%; top: 60px; }
-            .nav-btn { display: none !important; } /* Siempre ocultos en móvil para usar swipe */
+            .nav-btn { display: none !important; }
         }
     </style>
 </head>
@@ -137,7 +158,7 @@
         <button class="nav-btn next-btn" id="btn-der" onclick="cambiarTarjeta(1)">❯</button>
 
         <div class="floating-card" data-hermandad="SENTENCIA" data-dia="viernesp">
-            <div class="card-img"><img src="sentencia.jpg" alt="Coronación"></div>
+            <div class="card-img"><img src="sentencia.jpg" alt="Sentencia"></div>
             <div class="card-info">
                 <div class="card-time">🕒 16:00 - 02:00</div>
                 <div class="card-name">SENTENCIA</div>
@@ -154,17 +175,17 @@
             </div>
         </div>
 
-         <div class="floating-card" data-hermandad="CRISTO REY" data-dia="domingo">
-            <div class="card-img"><img src="borriquita.jpg" alt="Prendimiento"></div>
+         <div class="floating-card" data-hermandad="BORRIQUITA" data-dia="domingo">
+            <div class="card-img"><img src="borriquita.jpg" alt="Borriquita"></div>
             <div class="card-info">
-                <div class="card-time">🕒 15:50 - 23:00</div>
-                <div class="card-name">CRISTO REY</div>
+                <div class="card-time">🕒 18:00 - 01:30</div>
+                <div class="card-name">BORRIQUITA</div>
                 <div class="card-status hermandad-posicion">⛪ La Salle</div>
             </div>
         </div>
 
          <div class="floating-card" data-hermandad="HUMILDAD Y PACIENCIA" data-dia="domingo">
-            <div class="card-img"><img src="hyp.jpg" alt="Prendimiento"></div>
+            <div class="card-img"><img src="hyp.jpg" alt="Humildad"></div>
             <div class="card-info">
                 <div class="card-time">🕒 18:00 - 01:30</div>
                 <div class="card-name">HUMILDAD Y PACIENCIA</div>
@@ -173,7 +194,7 @@
         </div>
 
          <div class="floating-card" data-hermandad="COLUMNA" data-dia="domingo">
-            <div class="card-img"><img src="columna.jpg" alt="Prendimiento"></div>
+            <div class="card-img"><img src="columna.jpg" alt="Columna"></div>
             <div class="card-info">
                 <div class="card-time">🕒 18:00 - 01:30</div>
                 <div class="card-name">COLUMNA</div>
@@ -191,7 +212,7 @@
         </div>
 
         <div class="floating-card" data-hermandad="PRENDIMIENTO" data-dia="martes">
-            <div class="card-img"><img src="prendimiento.jpg" alt="Huerto"></div>
+            <div class="card-img"><img src="prendimiento.jpg" alt="Prendimiento"></div>
             <div class="card-info">
                 <div class="card-time">🕒 17:30 - 01:00</div>
                 <div class="card-name">PRENDIMIENTO</div>
@@ -200,7 +221,7 @@
         </div>
 
          <div class="floating-card" data-hermandad="CARIDAD" data-dia="martes">
-            <div class="card-img"><img src="caridad.jpg" alt="Huerto"></div>
+            <div class="card-img"><img src="caridad.jpg" alt="Caridad"></div>
             <div class="card-info">
                 <div class="card-time">🕒 17:30 - 01:00</div>
                 <div class="card-name">CARIDAD</div>
@@ -221,14 +242,38 @@
     <div id="map"></div>
 
     <div class="weather-card">
-        <div class="weather-icon" id="w-icon">☀️</div>
-        <div class="weather-data">
-            <div class="weather-temp" id="w-temp">21°C</div>
-            <div class="weather-details">
-                <div class="detail-item"><span>💨</span> <span id="w-viento">12 km/h</span></div>
-                <div class="detail-item"><span>💧</span> <span id="w-lluvia">0%</span></div>
+        
+        <div id="widget-weather" class="widget-content active-widget">
+            <div class="weather-icon" id="w-icon">🌤️</div>
+            <div class="weather-data">
+                <div class="weather-temp" id="w-temp">20°C</div>
+                <div class="weather-details">
+                    <div class="detail-item"><span>💨</span> <span id="w-viento">15 km/h</span></div>
+                    <div class="detail-item"><span>💧</span> <span id="w-lluvia">5%</span></div>
+                </div>
             </div>
         </div>
+
+        <div id="widget-linkedin" class="widget-content">
+            <div class="weather-icon" style="color: #0A66C2;"><i class="fa-brands fa-linkedin"></i></div>
+            <div class="weather-data">
+                <div class="weather-temp" style="font-size: 16px;">Desarrollo web por</div>
+                <div class="weather-details">
+                    <div class="detail-item" style="font-size: 13px;">@alvaroasencio</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="widget-instagram" class="widget-content">
+            <div class="weather-icon" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></div>
+            <div class="weather-data">
+                <div class="weather-temp" style="font-size: 16px;">Sígueme en IG</div>
+                <div class="weather-details">
+                    <div class="detail-item" style="font-size: 13px;">@alvaroasencioo</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -237,54 +282,36 @@
         var map = L.map('map', { zoomControl: false }).setView([36.4645, -6.1983], 15);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // ==========================================
         // --- LUGARES FIJOS EN EL MAPA ---
-        // ==========================================
         var iconoIglesia = L.divIcon({
             html: '<div style="font-size: 30px; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));">⛪</div>',
             className: 'icono-fijo', iconSize: [30, 30], iconAnchor: [15, 15]
         });
         
-        L.marker([36.465905364458784, -6.196121296822761], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Iglesia Mayor de San Pedro y San Pablo</b>"); // iglesia mayor
-        L.marker([36.458410589643485, -6.209852410418647], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San Servando y San Germán</b>"); // iglesia la ardila
-        L.marker([36.48131828691485, -6.199299892528005], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Inmaculada</b>"); // iglesia de la casería
-        L.marker([36.45765344058621, -6.203309532779297], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia Conventual de Nuestra Señora del Carmen</b>"); // iglesia del carmen
-        L.marker([36.47121125406187, -6.198062985839632], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia del Santo Cristo</b>"); //iglesia del cristo
-        L.marker([36.47214029192852, -6.197689822585912], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Capilla del Santísimo Cristo de la Vera Cruz</b>"); // iglesia del cristo viejo
-        L.marker([36.46842068564758, -6.193205814582786], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la divina pastora</b>"); // iglesia de la pastora
-        L.marker([36.47612323723379, -6.186873498961142], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Sagrada Familia</b>"); // iglesia de la sagrada familia
-        L.marker([36.4388720628276, -6.211643414818343], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida A.C.C. La Almadraba</b>"); // punto de salida sentencia
-        L.marker([36.45834008735279, -6.198506046899732], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida A.F. Ntro. Padre Jesús de la Pasión en la Coronación de Espinas y Ntra. Señora de la Candelaria</b>"); // pto. salida coronación
-        L.marker([36.46203508818409, -6.200081080397803], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia Vaticana y Castrense de San Francisco</b>"); // iglesia san francisco
-        L.marker([36.46344273527078, -6.198749722136309], {icon: iconoIglesia}).addTo(map).bindPopup("<b>La Salle</b>"); // iglesia de la Salle
-        L.marker([36.46356834690163, -6.197614758895538], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José</b>"); // iglesia san José
-        L.marker([36.46760620447974, -6.201176466609009], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José Artesano</b>"); // iglesia san José
+        L.marker([36.465905, -6.196121], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Iglesia Mayor de San Pedro y San Pablo</b>");
+        L.marker([36.458410, -6.209852], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San Servando y San Germán</b>");
+        L.marker([36.481318, -6.199299], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Inmaculada</b>");
+        L.marker([36.457653, -6.203309], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia Conventual de Nuestra Señora del Carmen</b>");
+        L.marker([36.471211, -6.198062], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia del Santo Cristo</b>");
+        L.marker([36.472140, -6.197689], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Capilla del Santísimo Cristo de la Vera Cruz</b>");
+        L.marker([36.468420, -6.193205], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Divina Pastora</b>");
+        L.marker([36.476123, -6.186873], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Sagrada Familia</b>");
+        L.marker([36.438872, -6.211643], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida A.C.C. La Almadraba</b>");
+        L.marker([36.458340, -6.198506], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida Coronación</b>");
+        L.marker([36.462035, -6.200081], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San Francisco</b>");
+        L.marker([36.463442, -6.198749], {icon: iconoIglesia}).addTo(map).bindPopup("<b>La Salle</b>");
+        L.marker([36.463568, -6.197614], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José</b>");
+        L.marker([36.467606, -6.201176], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José Artesano</b>");
         
-        // ==========================================
         // --- CALLES CORTADAS / CARRERA OFICIAL ---
-        // ==========================================
-
-        var estiloCalleCortada = {
-            color: 'red',       
-            weight: 8,          
-            opacity: 0.7,       
-            lineCap: 'round'    
-        };
-
+        var estiloCalleCortada = { color: 'red', weight: 8, opacity: 0.7, lineCap: 'round' };
         var trazadoCarreraOficial = [
-            [36.465389, -6.196967], 
-            [36.464645, -6.197701], 
-            [36.464958, -6.198182],
-            [36.464494, -6.198622]  
+            [36.465389, -6.196967], [36.464645, -6.197701], 
+            [36.464958, -6.198182], [36.464494, -6.198622]  
         ];
+        L.polyline(trazadoCarreraOficial, estiloCalleCortada).addTo(map).bindPopup("<b>🚧 Carrera Oficial 🚧</b>");
 
-        var lineaCarreraOficial = L.polyline(trazadoCarreraOficial, estiloCalleCortada).addTo(map);
-        lineaCarreraOficial.bindPopup("<b>🚧 Carrera Oficial 🚧</b><br>Calle cortada al tráfico.");
-
-
-        // ==========================================
         // --- CONFIGURACIÓN GPS (MODO MANUAL TEXTO) ---
-        // ==========================================
         const urlGPS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQagEjCsiVtXXRkqXsdJ7rzBV5-kbHd17tJic72JaYjD3Ir6hoT_tHA9Sl8pmNAZG6XKdIML7vnBQYa/pub?gid=0&single=true&output=csv";
         let marcadores = {};
 
@@ -302,7 +329,6 @@
                         const lon = parseFloat(c[2]);
                         
                         if (!isNaN(lat) && !isNaN(lon)) {
-                            // Actualiza SOLO el marcador en el mapa.
                             if (!marcadores[id]) {
                                 marcadores[id] = L.marker([lat, lon]).addTo(map);
                             } else {
@@ -314,14 +340,9 @@
             } catch (e) { console.error("Error GPS:", e); }
         }
 
-        // ==========================================
         // --- FILTRO DE TARJETAS POR DÍA ---
-        // ==========================================
+        const diaHoy = "viernesp"; 
         
-        // ⚠️ ¡CAMBIA ESTO CADA DÍA DE SEMANA SANTA! ⚠️
-        const diaHoy = "domingo"; 
-        
-        // 1. Esconder las tarjetas que no son de hoy
         document.querySelectorAll('.floating-card').forEach(tarjeta => {
             if (tarjeta.getAttribute('data-dia') !== diaHoy) {
                 tarjeta.style.display = 'none'; 
@@ -330,17 +351,12 @@
             }
         });
 
-        // 2. Controlar la navegación solo con las de hoy
         let indiceActual = 0;
         const tarjetas = document.querySelectorAll('.tarjeta-de-hoy');
         const totalTarjetas = tarjetas.length;
         
-        // Activar la primera tarjeta del día
-        if (totalTarjetas > 0) {
-            tarjetas[0].classList.add('active');
-        }
+        if (totalTarjetas > 0) tarjetas[0].classList.add('active');
 
-        // Si hay 1 o 0 tarjetas hoy, ocultar botones de flechas en escritorio
         if (totalTarjetas <= 1) {
             const btnIzq = document.getElementById('btn-izq');
             const btnDer = document.getElementById('btn-der');
@@ -349,8 +365,7 @@
         }
         
         function cambiarTarjeta(direccion) {
-            if (totalTarjetas <= 1) return; // Bloquear si solo hay una
-            
+            if (totalTarjetas <= 1) return; 
             tarjetas[indiceActual].classList.remove('active');
             indiceActual += direccion;
             if (indiceActual >= totalTarjetas) indiceActual = 0; 
@@ -358,7 +373,6 @@
             tarjetas[indiceActual].classList.add('active');
         }
 
-        // --- DESLIZAMIENTO TÁCTIL (SWIPE) ---
         let touchStartX = 0;
         let touchEndX = 0;
         const sliderContainer = document.getElementById('slider-container');
@@ -367,23 +381,47 @@
         sliderContainer.addEventListener('touchend', function(event) { touchEndX = event.changedTouches[0].screenX; manejarSwipe(); }, false);
         
         function manejarSwipe() {
-            if (totalTarjetas <= 1) return; // Bloquear si solo hay una
+            if (totalTarjetas <= 1) return;
             const umbral = 50; 
             if (touchEndX < touchStartX - umbral) cambiarTarjeta(1);
             if (touchEndX > touchStartX + umbral) cambiarTarjeta(-1);
         }
 
-        // --- FUNCIÓN DEL TIEMPO ---
-        function actualizarTiempo() {
-            document.getElementById('w-temp').innerText = "20°C";
-            document.getElementById('w-viento').innerText = "15 km/h";
-            document.getElementById('w-lluvia').innerText = "5%";
-            document.getElementById('w-icon').innerText = "🌤️"; 
+        // --- LÓGICA DEL WIDGET ROTATIVO (MEJORADA Y SIN CONGELAMIENTOS) ---
+        const configuracionWidgets = [
+            { id: 'widget-weather', duracion: 10000 },   // El tiempo se muestra 10 segundos
+            { id: 'widget-linkedin', duracion: 5000 },   // LinkedIn se muestra 5 segundos
+            { id: 'widget-instagram', duracion: 5000 }   // Instagram se muestra 5 segundos
+        ];
+        
+        let indiceWidgetActual = 0;
+
+        function rotarWidgetDinamico() {
+            // 1. Ocultar todos los widgets quitando la clase activa
+            configuracionWidgets.forEach(widget => {
+                document.getElementById(widget.id).classList.remove('active-widget');
+            });
+
+            // 2. Mostrar solo el widget que toca ahora
+            const widgetActual = configuracionWidgets[indiceWidgetActual];
+            document.getElementById(widgetActual.id).classList.add('active-widget');
+
+            // 3. Calcular cuál será el siguiente (y volver al principio si llegamos al final)
+            indiceWidgetActual++;
+            if (indiceWidgetActual >= configuracionWidgets.length) {
+                indiceWidgetActual = 0; 
+            }
+
+            // 4. Volver a ejecutar esta misma función cuando pase el tiempo del widget actual
+            setTimeout(rotarWidgetDinamico, widgetActual.duracion);
         }
 
+        // Arrancar el motor de rotación
+        rotarWidgetDinamico();
+
+        // Llamadas base
         setInterval(actualizarGPS, 5000);
         actualizarGPS();
-        actualizarTiempo();
 
     </script>
 </body>
