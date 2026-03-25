@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Cofrade SF - Live 2026</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --color-principal: #734960;
+            --color-fondo: #f4f4f9;
+            --sombra: 0 8px 32px rgba(0,0,0,0.2);
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--color-fondo); overflow: hidden; height: 100vh; }
+
+        #map { width: 100vw; height: 100vh; z-index: 1; }
+
+        /* --- CONTENEDOR PRINCIPAL DE TARJETAS --- */
+        .cards-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; 
+            max-width: 450px;
+            height: 110px;
+            z-index: 1000;
+        }
+
+        /* --- ESTILO DE LAS TARJETAS (APILADAS) --- */
+        .floating-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            border: 1px solid rgba(255,255,255,0.3);
+            
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            z-index: 1;
+        }
+
+        .floating-card.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        .card-img { width: 30%; background: #ddd; flex-shrink: 0; }
+        .card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .card-info { width: 70%; padding: 15px 20px; display: flex; flex-direction: column; justify-content: center; }
+        .card-time { font-size: 13px; color: var(--color-principal); font-weight: 700; margin-bottom: 2px; }
+        .card-name { font-size: 18px; font-weight: 700; color: #2d2d2d; text-transform: uppercase; line-height: 1.2; }
+        .card-status { font-size: 12px; color: #666; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- BOTONES DE NAVEGACIÓN --- */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.7);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 1010;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: var(--color-principal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .nav-btn:hover { background: white; }
+        .prev-btn { left: -50px; } 
+        .next-btn { right: -50px; } 
+
+        /* --- TARJETA DEL TIEMPO --- */
+        .weather-card {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: var(--sombra);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .weather-icon { font-size: 32px; }
+        .weather-data { display: flex; flex-direction: column; }
+        .weather-temp { font-size: 20px; font-weight: 700; color: #2d2d2d; }
+        .weather-details { display: flex; gap: 12px; font-size: 11px; color: #555; font-weight: 600; margin-top: 2px; }
+        .detail-item { display: flex; align-items: center; gap: 4px; }
+
+        /* --- CLASE PARA EL ICONO FIJO --- */
+        .icono-fijo {
+            background: transparent;
+            border: none;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* RESPONSIVE MÓVIL */
+        @media (max-width: 600px) {
+            .weather-card { left: 20px; right: 20px; bottom: 20px; justify-content: center; }
+            .cards-container { width: 90%; top: 60px; }
+            .nav-btn { display: none !important; } /* Siempre ocultos en móvil para usar swipe */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cards-container" id="slider-container">
+        
+        <button class="nav-btn prev-btn" id="btn-izq" onclick="cambiarTarjeta(-1)">❮</button>
+        <button class="nav-btn next-btn" id="btn-der" onclick="cambiarTarjeta(1)">❯</button>
+
+        <div class="floating-card" data-hermandad="SENTENCIA" data-dia="viernesp">
+            <div class="card-img"><img src="sentencia.jpg" alt="Coronación"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 16:00 - 02:00</div>
+                <div class="card-name">SENTENCIA</div>
+                <div class="card-status hermandad-posicion">⛪ El Cerro de los Mártires</div>
+            </div>
+        </div>
+        
+        <div class="floating-card" data-hermandad="CORONACION" data-dia="sabado">
+            <div class="card-img"><img src="coronacion.jpg" alt="Coronación"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 16:00 - 02:00</div>
+                <div class="card-name">CORONACIÓN</div>
+                <div class="card-status hermandad-posicion">⛪ C/ San Onofre Nº5</div>
+            </div>
+        </div>
+
+         <div class="floating-card" data-hermandad="BORRIQUITA" data-dia="domingo">
+            <div class="card-img"><img src="borriquita.jpg" alt="Prendimiento"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 18:00 - 01:30</div>
+                <div class="card-name">BORRIQUITA</div>
+                <div class="card-status hermandad-posicion">⛪ La Salle</div>
+            </div>
+        </div>
+
+         <div class="floating-card" data-hermandad="HUMILDAD Y PACIENCIA" data-dia="domingo">
+            <div class="card-img"><img src="hyp.jpg" alt="Prendimiento"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 18:00 - 01:30</div>
+                <div class="card-name">HUMILDAD Y PACIENCIA</div>
+                <div class="card-status hermandad-posicion">⛪ Parroquia San Servando y San Germán</div>
+            </div>
+        </div>
+
+         <div class="floating-card" data-hermandad="COLUMNA" data-dia="domingo">
+            <div class="card-img"><img src="columna.jpg" alt="Prendimiento"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 18:00 - 01:30</div>
+                <div class="card-name">COLUMNA</div>
+                <div class="card-status hermandad-posicion">⛪ Iglesia Mayor</div>
+            </div>
+        </div>
+
+        <div class="floating-card" data-hermandad="HUERTO" data-dia="martes">
+            <div class="card-img"><img src="huerto.jpg" alt="Huerto"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 17:30 - 01:00</div>
+                <div class="card-name">HUERTO</div>
+                <div class="card-status hermandad-posicion">⛪ Parroquia de la Divina Pastora</div>
+            </div>
+        </div>
+
+        <div class="floating-card" data-hermandad="PRENDIMIENTO" data-dia="martes">
+            <div class="card-img"><img src="prendimiento.jpg" alt="Huerto"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 17:30 - 01:00</div>
+                <div class="card-name">PRENDIMIENTO</div>
+                <div class="card-status hermandad-posicion">⛪ Parroquia San José Artesano</div>
+            </div>
+        </div>
+
+         <div class="floating-card" data-hermandad="CARIDAD" data-dia="martes">
+            <div class="card-img"><img src="caridad.jpg" alt="Huerto"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 17:30 - 01:00</div>
+                <div class="card-name">CARIDAD</div>
+                <div class="card-status hermandad-posicion">⛪ Parroquia Vaticana y Castrense de San Francisco</div>
+            </div>
+        </div>
+
+        <div class="floating-card" data-hermandad="AFLIGIDOS" data-dia="lunes">
+            <div class="card-img"><img src="afligidos.jpg" alt="Afligidos"></div>
+            <div class="card-info">
+                <div class="card-time">🕒 18:00 - 00:30</div>
+                <div class="card-name">AFLIGIDOS</div>
+                <div class="card-status hermandad-posicion">⛪ Iglesia del Cristo</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="weather-card">
+        <div class="weather-icon" id="w-icon">☀️</div>
+        <div class="weather-data">
+            <div class="weather-temp" id="w-temp">21°C</div>
+            <div class="weather-details">
+                <div class="detail-item"><span>💨</span> <span id="w-viento">12 km/h</span></div>
+                <div class="detail-item"><span>💧</span> <span id="w-lluvia">0%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // --- INICIALIZAR MAPA ---
+        var map = L.map('map', { zoomControl: false }).setView([36.4645, -6.1983], 15);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // ==========================================
+        // --- LUGARES FIJOS EN EL MAPA ---
+        // ==========================================
+        var iconoIglesia = L.divIcon({
+            html: '<div style="font-size: 30px; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));">⛪</div>',
+            className: 'icono-fijo', iconSize: [30, 30], iconAnchor: [15, 15]
+        });
+        
+        L.marker([36.465905364458784, -6.196121296822761], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Iglesia Mayor de San Pedro y San Pablo</b>"); // iglesia mayor
+        L.marker([36.458410589643485, -6.209852410418647], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San Servando y San Germán</b>"); // iglesia la ardila
+        L.marker([36.48131828691485, -6.199299892528005], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Inmaculada</b>"); // iglesia de la casería
+        L.marker([36.45765344058621, -6.203309532779297], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia Conventual de Nuestra Señora del Carmen</b>"); // iglesia del carmen
+        L.marker([36.47121125406187, -6.198062985839632], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia del Santo Cristo</b>"); //iglesia del cristo
+        L.marker([36.47214029192852, -6.197689822585912], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Capilla del Santísimo Cristo de la Vera Cruz</b>"); // iglesia del cristo viejo
+        L.marker([36.46842068564758, -6.193205814582786], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la divina pastora</b>"); // iglesia de la pastora
+        L.marker([36.47612323723379, -6.186873498961142], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de la Sagrada Familia</b>"); // iglesia de la sagrada familia
+        L.marker([36.4388720628276, -6.211643414818343], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida A.C.C. La Almadraba</b>"); // punto de salida sentencia
+        L.marker([36.45834008735279, -6.198506046899732], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Salida A.F. Ntro. Padre Jesús de la Pasión en la Coronación de Espinas y Ntra. Señora de la Candelaria</b>"); // pto. salida coronación
+        L.marker([36.46203508818409, -6.200081080397803], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia Vaticana y Castrense de San Francisco</b>"); // iglesia san francisco
+        L.marker([36.46344273527078, -6.198749722136309], {icon: iconoIglesia}).addTo(map).bindPopup("<b>La Salle</b>"); // iglesia de la Salle
+        L.marker([36.46356834690163, -6.197614758895538], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José</b>"); // iglesia san José
+        L.marker([36.46760620447974, -6.201176466609009], {icon: iconoIglesia}).addTo(map).bindPopup("<b>Parroquia de San José Artesano</b>"); // iglesia san José
+        
+        // ==========================================
+        // --- CALLES CORTADAS / CARRERA OFICIAL ---
+        // ==========================================
+
+        var estiloCalleCortada = {
+            color: 'red',       
+            weight: 8,          
+            opacity: 0.7,       
+            lineCap: 'round'    
+        };
+
+        var trazadoCarreraOficial = [
+            [36.465389, -6.196967], 
+            [36.464645, -6.197701], 
+            [36.464958, -6.198182],
+            [36.464494, -6.198622]  
+        ];
+
+        var lineaCarreraOficial = L.polyline(trazadoCarreraOficial, estiloCalleCortada).addTo(map);
+        lineaCarreraOficial.bindPopup("<b>🚧 Carrera Oficial 🚧</b><br>Calle cortada al tráfico.");
+
+
+        // ==========================================
+        // --- CONFIGURACIÓN GPS (MODO MANUAL TEXTO) ---
+        // ==========================================
+        const urlGPS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQagEjCsiVtXXRkqXsdJ7rzBV5-kbHd17tJic72JaYjD3Ir6hoT_tHA9Sl8pmNAZG6XKdIML7vnBQYa/pub?gid=0&single=true&output=csv";
+        let marcadores = {};
+
+        async function actualizarGPS() {
+            try {
+                const res = await fetch(urlGPS + "&t=" + Date.now());
+                const csv = await res.text();
+                const filas = csv.split("\n").slice(1);
+                
+                filas.forEach(f => {
+                    const c = f.split(",");
+                    if (c.length >= 3) {
+                        const id = c[0].trim().toUpperCase();
+                        const lat = parseFloat(c[1]);
+                        const lon = parseFloat(c[2]);
+                        
+                        if (!isNaN(lat) && !isNaN(lon)) {
+                            // Actualiza SOLO el marcador en el mapa.
+                            if (!marcadores[id]) {
+                                marcadores[id] = L.marker([lat, lon]).addTo(map);
+                            } else {
+                                marcadores[id].setLatLng([lat, lon]);
+                            }
+                        }
+                    }
+                });
+            } catch (e) { console.error("Error GPS:", e); }
+        }
+
+        // ==========================================
+        // --- FILTRO DE TARJETAS POR DÍA ---
+        // ==========================================
+        
+        // ⚠️ ¡CAMBIA ESTO CADA DÍA DE SEMANA SANTA! ⚠️
+        const diaHoy = "viernesp"; 
+        
+        // 1. Esconder las tarjetas que no son de hoy
+        document.querySelectorAll('.floating-card').forEach(tarjeta => {
+            if (tarjeta.getAttribute('data-dia') !== diaHoy) {
+                tarjeta.style.display = 'none'; 
+            } else {
+                tarjeta.classList.add('tarjeta-de-hoy'); 
+            }
+        });
+
+        // 2. Controlar la navegación solo con las de hoy
+        let indiceActual = 0;
+        const tarjetas = document.querySelectorAll('.tarjeta-de-hoy');
+        const totalTarjetas = tarjetas.length;
+        
+        // Activar la primera tarjeta del día
+        if (totalTarjetas > 0) {
+            tarjetas[0].classList.add('active');
+        }
+
+        // Si hay 1 o 0 tarjetas hoy, ocultar botones de flechas en escritorio
+        if (totalTarjetas <= 1) {
+            const btnIzq = document.getElementById('btn-izq');
+            const btnDer = document.getElementById('btn-der');
+            if(btnIzq) btnIzq.style.display = 'none';
+            if(btnDer) btnDer.style.display = 'none';
+        }
+        
+        function cambiarTarjeta(direccion) {
+            if (totalTarjetas <= 1) return; // Bloquear si solo hay una
+            
+            tarjetas[indiceActual].classList.remove('active');
+            indiceActual += direccion;
+            if (indiceActual >= totalTarjetas) indiceActual = 0; 
+            if (indiceActual < 0) indiceActual = totalTarjetas - 1;
+            tarjetas[indiceActual].classList.add('active');
+        }
+
+        // --- DESLIZAMIENTO TÁCTIL (SWIPE) ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const sliderContainer = document.getElementById('slider-container');
+        
+        sliderContainer.addEventListener('touchstart', function(event) { touchStartX = event.changedTouches[0].screenX; }, false);
+        sliderContainer.addEventListener('touchend', function(event) { touchEndX = event.changedTouches[0].screenX; manejarSwipe(); }, false);
+        
+        function manejarSwipe() {
+            if (totalTarjetas <= 1) return; // Bloquear si solo hay una
+            const umbral = 50; 
+            if (touchEndX < touchStartX - umbral) cambiarTarjeta(1);
+            if (touchEndX > touchStartX + umbral) cambiarTarjeta(-1);
+        }
+
+        // --- FUNCIÓN DEL TIEMPO ---
+        function actualizarTiempo() {
+            document.getElementById('w-temp').innerText = "20°C";
+            document.getElementById('w-viento').innerText = "15 km/h";
+            document.getElementById('w-lluvia').innerText = "5%";
+            document.getElementById('w-icon').innerText = "🌤️"; 
+        }
+
+        setInterval(actualizarGPS, 5000);
+        actualizarGPS();
+        actualizarTiempo();
+
+    </script>
+</body>
+</html>
