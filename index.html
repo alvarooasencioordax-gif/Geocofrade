@@ -387,37 +387,53 @@
             if (touchEndX > touchStartX + umbral) cambiarTarjeta(-1);
         }
 
-        // --- LÓGICA DEL WIDGET ROTATIVO (MEJORADA Y SIN CONGELAMIENTOS) ---
+// --- LÓGICA DEL WIDGET ROTATIVO (A PRUEBA DE FALLOS) ---
         const configuracionWidgets = [
-            { id: 'widget-weather', duracion: 10000 },   // El tiempo se muestra 10 segundos
-            { id: 'widget-linkedin', duracion: 5000 },   // LinkedIn se muestra 5 segundos
-            { id: 'widget-instagram', duracion: 5000 }   // Instagram se muestra 5 segundos
+            { id: 'widget-weather', duracion: 10000 },
+            { id: 'widget-linkedin', duracion: 5000 },
+            { id: 'widget-instagram', duracion: 5000 }
         ];
         
         let indiceWidgetActual = 0;
 
         function rotarWidgetDinamico() {
-            // 1. Ocultar todos los widgets quitando la clase activa
+            console.log("⏱️ Cambiando al widget índice:", indiceWidgetActual);
+
+            // 1. Ocultar todos comprobando que existen primero
             configuracionWidgets.forEach(widget => {
-                document.getElementById(widget.id).classList.remove('active-widget');
+                const elemento = document.getElementById(widget.id);
+                if (elemento) {
+                    elemento.classList.remove('active-widget');
+                }
             });
 
-            // 2. Mostrar solo el widget que toca ahora
+            // 2. Mostrar el que toca ahora
             const widgetActual = configuracionWidgets[indiceWidgetActual];
-            document.getElementById(widgetActual.id).classList.add('active-widget');
+            const elementoActual = document.getElementById(widgetActual.id);
+            
+            if (elementoActual) {
+                elementoActual.classList.add('active-widget');
+            } else {
+                console.error("❌ Ojo, no encuentro en el HTML el ID:", widgetActual.id);
+            }
 
-            // 3. Calcular cuál será el siguiente (y volver al principio si llegamos al final)
+            // 3. Calcular el siguiente
             indiceWidgetActual++;
             if (indiceWidgetActual >= configuracionWidgets.length) {
                 indiceWidgetActual = 0; 
             }
 
-            // 4. Volver a ejecutar esta misma función cuando pase el tiempo del widget actual
+            // 4. Volver a ejecutar
             setTimeout(rotarWidgetDinamico, widgetActual.duracion);
         }
 
-        // Arrancar el motor de rotación
-        rotarWidgetDinamico();
+        // 5. Arrancar solo si estamos seguros de que el HTML ya está listo
+        if (document.getElementById('widget-weather')) {
+            console.log("✅ Motor de widgets iniciado correctamente.");
+            rotarWidgetDinamico();
+        } else {
+            console.error("❌ El HTML de los widgets no ha cargado antes que el script.");
+        }
 
         // Llamadas base
         setInterval(actualizarGPS, 5000);
