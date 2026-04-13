@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoCofrade SF - Live 2026</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="ayto-logo">
+        <img src="img/aytosf.png" alt="Ayuntamiento San Fernando">
+    </div>
+
+    <div class="left-tools" id="ui-tools">
+        <button class="tool-btn" onclick="toggleMenu('panel-menu')" title="Menú">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        
+        <button class="tool-btn" onclick="toggleMenu('panel-capas')" title="Capas del Mapa">
+            <i class="fa-solid fa-layer-group"></i>
+        </button>
+        
+        <button class="tool-btn" onclick="togglePantallaLimpia()" title="Despejar Pantalla">
+            <i class="fa-solid fa-eye-slash"></i>
+        </button>
+    </div>
+
+    <button class="tool-btn return-btn" onclick="togglePantallaLimpia()" title="Mostrar Interfaz">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div class="side-panel" id="panel-menu">
+        <h3 data-key="menu_title">Menú Principal</h3>
+        
+        <label onclick="window.location.href='./index.html'">
+            🏠 <span data-key="nav_home">Inicio</span>
+        </label>
+        
+        <label onclick="window.location.href='./hermandades.html'">
+            ⛪ <span data-key="nav_hermandades">Hermandades</span>
+        </label>
+        
+        <label>
+            ⚠️ <span data-key="nav_report">Reportar Incidencia</span>
+        </label>
+        
+        <label onclick="window.location.href='./ajustes.html'">
+            ⚙️ <span data-key="nav_settings">Ajustes</span>
+        </label>
+    </div>
+
+    <div class="side-panel" id="panel-capas">
+        <h3 data-key="layers_title">Capas del Mapa</h3>
+        <label>
+            <input type="checkbox" id="check-iglesias" checked onchange="toggleCapa('iglesias')"> 
+            <span data-key="layer_churches">Iglesias y Templos</span>
+        </label>
+        <label>
+            <input type="checkbox" id="check-carrera" checked onchange="toggleCapa('carrera')"> 
+            <span data-key="layer_carrera">Carrera Oficial</span>
+        </label>
+        
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+        <p style="font-size: 11px; font-weight: bold; color: var(--color-principal); margin-bottom: 5px;" data-key="map_style">ESTILO MAPA</p>
+        
+        <label>
+            <input type="radio" name="mapa" checked onclick="cambiarBaseMapa('claro')"> 
+            <span data-key="style_light">Mapa Base</span>
+        </label>
+        <label>
+            <input type="radio" name="mapa" onclick="cambiarBaseMapa('oscuro')"> 
+            <span data-key="style_dark">Vista Nocturna</span>
+        </label>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="weather-card">
+        <div id="widget-weather" class="widget-content active-widget">
+            <div class="weather-icon" id="w-icon">🌤️</div>
+            <div class="weather-data">
+                <div class="weather-temp" id="w-temp">20°C</div>
+                <div class="weather-details">
+                    <div class="detail-item"><span>💨</span> <span id="w-viento">15 km/h</span></div>
+                    <div class="detail-item"><span>💧</span> <span id="w-lluvia">5%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="widget-linkedin" class="widget-content">
+            <div class="weather-icon" style="color: #0A66C2;"><i class="fa-brands fa-linkedin"></i></div>
+            <div class="weather-data">
+                <div class="weather-temp" style="font-size: 16px;">Desarrollo web por</div>
+                <div class="weather-details">
+                    <div class="detail-item" style="font-size: 13px;">@alvaroasencio</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="widget-instagram" class="widget-content">
+            <div class="weather-icon" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></div>
+            <div class="weather-data">
+                <div class="weather-temp" style="font-size: 16px;">Sígueme en IG</div>
+                <div class="weather-details">
+                    <div class="detail-item" style="font-size: 13px;">@alvaroasencioo</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

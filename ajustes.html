@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes - GeoCofrade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <a href="index.html" class="tool-btn back-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
+    <div class="container">
+        <h2 style="color: var(--color-principal); margin-bottom: 25px;">Ajustes</h2>
+
+        <div class="seccion-ajuste">
+            <div class="opcion">
+                <span>🌓 Tema Predeterminado</span>
+                <select id="select-tema" onchange="guardarAjustes()">
+                    <option value="claro">Modo Claro</option>
+                    <option value="oscuro">Modo Nocturno</option>
+                </select>
+            </div>
+            
+            <div class="opcion">
+                <span>🌐 Idioma</span>
+                <select id="select-idioma" onchange="guardarAjustes()">
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="seccion-ajuste" style="opacity: 0.8; font-size: 13px;">
+            <div class="opcion">
+                <span>📱 Versión</span>
+                <span>1.0.26 (Beta)</span>
+            </div>
+            <div class="opcion">
+                <span>👨‍💻 Desarrollador</span>
+                <span>@alvaroasencio</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Al cargar la página, ponemos los selectores como estaban guardados
+        window.onload = function() {
+            const tema = localStorage.getItem('temaPref') || 'claro';
+            const idioma = localStorage.getItem('idiomaPref') || 'es';
+            
+            document.getElementById('select-tema').value = tema;
+            document.getElementById('select-idioma').value = idioma;
+        };
+
+        // Función que guarda en el navegador cada vez que cambias una opción
+        function guardarAjustes() {
+            const tema = document.getElementById('select-tema').value;
+            const idioma = document.getElementById('select-idioma').value;
+            
+            localStorage.setItem('temaPref', tema);
+            localStorage.setItem('idiomaPref', idioma);
+            
+            console.log("Ajustes guardados: " + tema + " / " + idioma);
+        }
+    </script>
+</body>
+</html>
