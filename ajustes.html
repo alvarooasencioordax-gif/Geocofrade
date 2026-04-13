@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes - GeoCofrade SF</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="ios-page">
+
+    <header class="ios-header">
+        <a href="index.html" class="back-btn" data-key="nav-volver">
+            <i class="fa-solid fa-chevron-left"></i> Volver
+        </a>
+        <h1 data-key="titulo-ajustes">Ajustes</h1>
+    </header>
+
+    <main class="ajustes-container">
+        <p class="section-title" data-key="seccion-mapa">Estilo de mapa predeterminado</p>
+        <div class="ios-group">
+            <div class="ios-item" onclick="seleccionarMapa('claro')">
+                <span data-key="v-clara">Vista Clara</span>
+                <i class="fa-solid fa-check check-icon" id="check-claro"></i>
+            </div>
+            <div class="ios-item" onclick="seleccionarMapa('oscuro')">
+                <span data-key="v-nocturna">Vista Nocturna</span>
+                <i class="fa-solid fa-check check-icon" id="check-oscuro"></i>
+            </div>
+            <div class="ios-item" onclick="seleccionarMapa('satelite')">
+                <span data-key="v-satelite">Vista Satélite</span>
+                <i class="fa-solid fa-check check-icon" id="check-satelite"></i>
+            </div>
+        </div>
+
+        <p class="section-title" data-key="seccion-idioma">Idioma / Language</p>
+        <div class="ios-group">
+            <div class="ios-item" onclick="seleccionarIdioma('es')">
+                <span>Español</span>
+                <i class="fa-solid fa-check check-icon-lang" id="check-es"></i>
+            </div>
+            <div class="ios-item" onclick="seleccionarIdioma('en')">
+                <span>English</span>
+                <i class="fa-solid fa-check check-icon-lang" id="check-en"></i>
+            </div>
+        </div>
+
+        <p class="section-title" data-key="seccion-soporte">Soporte</p>
+        <div class="ios-group">
+            <div class="ios-item item-danger" onclick="reportarIncidencia()">
+                <span class="text-centered" data-key="btn-reportar">Reportar incidencia</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/lang.js"></script>     <script src="js/settings.js"></script> </body>
+</html>

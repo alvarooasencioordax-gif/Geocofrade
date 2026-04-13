@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoCofrade SF - Live 2026</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <header class="ayto-logo">
+        <img src="img/aytosf.png" alt="Ayuntamiento de San Fernando"> 
+    </header>
+
+    <nav class="left-tools" id="ui-tools">
+        <button class="tool-btn" onclick="toggleMenu('panel-menu')" title="Menú"> 
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <button class="tool-btn" onclick="toggleMenu('panel-capas')" title="Capas"> 
+            <i class="fa-solid fa-layer-group"></i>
+        </button>
+        <button class="tool-btn" onclick="togglePantallaLimpia()" title="Despejar pantalla"> 
+            <i class="fa-solid fa-eye-slash"></i>
+        </button>
+    </nav>
+
+    <button class="tool-btn return-btn" onclick="togglePantallaLimpia()" title="Mostrar Interfaz"> 
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <aside class="side-panel" id="panel-menu">
+        <h3 data-key="menu_title">Menú Principal</h3> 
+
+        <nav aria-label="Navegación secundaria">
+            <ul class="menu-list">
+                <li>
+                    <a href="hermandades.html">
+                        <span class="icon">⛪</span> <span data-key="nav_hermandades">Hermandades</span> 
+                    </a>
+                </li>
+                 <li>
+                    <a href="javascript:void(0)" onclick="abrirAjustes()">
+                        <span class="icon">⚙️</span> <span data-key="nav_settings">Ajustes</span> 
+                    </a>
+                </li>
+            </ul>
+        </nav>     
+    </aside>
+
+    <aside class="side-panel" id="panel-capas">
+        <h3 data-key="layers_title">Estilo del Mapa</h3> 
+
+        <fieldset class="map-style-group" style="border: none; padding: 0; margin: 0;">
+            <ul class="layers-list" style="list-style:none; padding: 0">
+                <li>
+                    <label class="style-option">
+                        <input type="radio" name="mapa" checked onclick="CambiarBaseMapa('claro')"> 
+                        <span data-key="style_light">Vista Clara</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="style-option">
+                        <input type="radio" name="mapa" onclick="CambiarBaseMapa('oscuro')"> 
+                        <span data-key="style_dark">Vista Nocturna</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="style-option">
+                        <input type="radio" name="mapa" onclick="CambiarBaseMapa('satelite')"> 
+                        <span data-key="style_satellite">Vista Satélite</span>
+                    </label>
+                </li>
+            </ul>
+        </fieldset>
+    </aside>
+
+    <section class="weather-card" aria-label="Información meteorológica y contacto">
+        <article id="widget-weather" class="widget-content active-widget"> 
+            <div class="weather-icon" id="w-icon">🌦️</div>
+            <div class="weather-data">
+                <p class="weather-temp" id="w-temp">20°C</p>
+                <div class="weather-details">
+                    <span class="detail-item">💨 <span id="w-viento">15 km/h</span></span>
+                    <span class="detail-item">🌧️ <span id="w-lluvia">5%</span></span>
+                </div>
+            </div>
+        </article>
+
+        <article id="widget-linkedin" class="widget-content"> 
+            <a href="https://linkedin.com/in/alvaroasencio" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                <div class="weather-icon" style="color: #0A66C2;"><i class="fa-brands fa-linkedin"></i></div>
+                <div class="weather-data">
+                    <p data-key="widget_dev" style="margin: 0; font-size: 14px; font-weight: 600;">Desarrollo web</p>
+                    <p style="margin: 0; font-size: 12px;">@alvaroasencio</p>
+                </div>
+            </a>
+        </article>
+
+        <article id="widget-instagram" class="widget-content"> 
+            <a href="https://instagram.com/alvaroasencioo" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                <div class="weather-icon" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></div>
+                <div class="weather-data">
+                    <p data-key="widget_ig" style="margin: 0; font-size: 14px; font-weight: 600;">Sígueme en IG</p>
+                    <p style="margin: 0; font-size: 12px;">@alvaroasencioo</p>
+                </div>
+            </a>
+        </article>
+    </section>  
+
+    <main id="map"></main>
+
+    <div id="panel-overlay" onclick="cerrarAjustes()"></div>
+    <div id="sheet-ajustes" class="bottom-sheet">
+        <div class="sheet-header">
+            <div class="sheet-handle"></div>
+            <h2 data-key="titulo-ajustes">Ajustes</h2>
+        </div>
+        <div class="sheet-content">
+            <p class="section-title" data-key="seccion-idioma">Idioma</p>
+            <div class="ios-group">
+                <div class="ios-item" onclick="seleccionarIdioma('es')">
+                    <span>Español</span>
+                    <i class="fa-solid fa-check check-icon-lang" id="check-es"></i>
+                </div>
+                <div class="ios-item" onclick="seleccionarIdioma('en')">
+                    <span>English</span>
+                    <i class="fa-solid fa-check check-icon-lang" id="check-en"></i>
+                </div>
+            </div>
+            <div class="ios-group" style="margin-top: 20px;">
+                <div class="ios-item item-danger" onclick="reportarIncidencia()">
+                    <span class="text-centered" data-key="btn-reportar">Reportar incidencia</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/lang.js"></script> 
+    <script src="js/settings.js"></script> <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registrado correctamente', reg))
+                .catch(err => console.warn('Error al registrar el Service Worker', err));
+            });
+        }
+    </script>
+</body>
+</html>
