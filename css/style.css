@@ -1,0 +1,366 @@
+/* =============================================================
+   1. VARIABLES Y CONFIGURACIÓN GLOBAL
+   ============================================================= */
+:root {
+    --color-principal: #734960; 
+    --color-fondo: #f4f4f9;
+    --sombra: 0 8px 32px rgba(0,0,0,0.2);
+    --glass: rgba(255, 255, 255, 0.9);
+    --texto-oscuro: #2d2d2d;
+    --texto-suave: #555;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--color-fondo);
+}
+
+#map {
+    height: 100vh;
+    width: 100vw;
+    z-index: 1;
+}
+
+/* =============================================================
+   2. ELEMENTOS DE LA INTERFAZ (UI)
+   ============================================================= */
+
+.ayto-logo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--glass);
+    padding: 8px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--sombra);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.ayto-logo img {
+    height: 45px;
+    width: auto;
+    display: block;
+}
+
+.left-tools {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tool-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--color-principal);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--sombra);
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+    transform: scale(1.1);
+    background: white;
+}
+
+.return-btn {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+}
+
+.ui-hidden .return-btn { display: flex !important; }
+.ui-hidden .left-tools, .ui-hidden .ayto-logo, .ui-hidden .weather-card, .ui-hidden .side-panel {
+    display: none !important;
+}
+
+/* =============================================================
+   3. PANELES LATERALES (Menú y Capas)
+   ============================================================= */
+.side-panel {
+    position: absolute;
+    top: 20px;
+    left: 80px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--sombra);
+    z-index: 999;
+    border: 1px solid rgba(255,255,255,0.4);
+    min-width: 240px;
+    display: none; 
+}
+
+.side-panel.active { display: block; }
+
+.side-panel h3 {
+    font-size: 14px;
+    color: var(--color-principal);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.menu-list li, .layers-list li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-list a, .layers-list label {
+    text-decoration: none;
+    color: var(--texto-oscuro);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.style-option { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+input[type="radio"] { accent-color: var(--color-principal); cursor: pointer; }
+
+/* =============================================================
+   4. WIDGETS (Clima y Redes Sociales) - RESTAURADO
+   ============================================================= */
+.weather-icon {
+    margin-right: 20px !important; /* Ajusta este número a tu gusto */
+}
+
+.weather-data p {
+    margin-bottom: 4px !important;
+}
+
+   .weather-card {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    padding: 18px; /* Un poco más de aire */
+    border-radius: 20px;
+    box-shadow: var(--sombra);
+    z-index: 1000;
+    min-width: 220px;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.weather-temp { 
+    font-size: 22px; /* Más grande */
+    font-weight: 600; /* BOLD restaurado */
+    color: var(--texto-oscuro); 
+    line-height: 1; 
+}
+
+.weather-icon {
+    font-size: 32px; /* Iconos más grandes */
+}
+
+/* Para los iconos de FontAwesome (LI e IG) */
+.weather-icon i {
+    font-size: 32px;
+}
+
+.widget-content {
+    display: none;
+    align-items: center;
+    gap: 15px;
+}
+
+.widget-content.active-widget {
+    display: flex;
+    animation: giroEntrada 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =============================================================
+   5. BOTTOM SHEET (Nuevos Ajustes)
+   ============================================================= */
+/* =============================================================
+   5. BOTTOM SHEET (Ajustes Estilo Glass Claro)
+   ============================================================= */
+
+#panel-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Overlay más sutil */
+    z-index: 2500;
+    display: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.bottom-sheet {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    max-height: 80vh;
+    /* FONDO CLARO TRASLÚCIDO */
+    background: rgba(255, 255, 255, 0.92); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    
+    border-radius: 25px 25px 0 0;
+    z-index: 3000;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    color: #2d2d2d; /* Texto oscuro para fondo claro */
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+}
+
+.bottom-sheet.active { transform: translateY(0); }
+
+.sheet-header {
+    padding: 15px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.sheet-handle {
+    width: 36px; height: 5px;
+    background: rgba(0,0,0,0.15); /* Handle más suave */
+    border-radius: 10px;
+    margin: 0 auto 10px;
+}
+
+.sheet-header h2 {
+    color: #2d2d2d;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sheet-close {
+    position: absolute; right: 20px; top: 18px;
+    background: rgba(0,0,0,0.05); 
+    border: none;
+    color: #555; width: 30px; height: 30px;
+    border-radius: 50%; cursor: pointer;
+    display: flex; justify-content: center; align-items: center;
+    transition: background 0.2s;
+}
+
+.sheet-close:hover { background: rgba(0,0,0,0.1); }
+
+.sheet-content {
+    padding: 10px 16px 40px;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+/* --- Estilos Internos de Ajustes --- */
+
+.section-title {
+    color: var(--color-principal); /* Tu morado */
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 25px 0 8px 15px;
+    opacity: 0.8;
+}
+
+.ios-group {
+    background: white; /* Tarjetas blancas puras */
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.ios-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f2f2f7;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ios-item:last-child { border-bottom: none; }
+
+.ios-item span { 
+    font-size: 16px; 
+    color: #2d2d2d; 
+    font-weight: 500;
+}
+
+/* Efecto de pulsación más natural en claro */
+.ios-item:active { background-color: #f2f2f7; }
+
+.check-icon, .check-icon-lang {
+    display: none;
+    color: var(--color-principal); /* Check en morado */
+    font-size: 16px;
+}
+
+.is-selected .check-icon, 
+.is-selected-lang .check-icon-lang {
+    display: block;
+}
+
+/* Botón peligro con estilo iOS claro */
+.item-danger {
+    margin-top: 1px;
+}
+
+.item-danger span { color: #ff453a !important; font-weight: 500; text-align: center; width: 100%; }
+
+/* =============================================================
+   6. RESPONSIVE (MÓVIL) - RESTAURADO
+   ============================================================= */
+@media (max-width: 600px) {
+    .weather-card {
+        right: 50% !important;
+        left: 50% !important;
+        bottom: 30px;
+        transform: translateX(-50%); 
+        width: 90%; /* Un pelín más ancho en móvil */
+        padding: 15px 20px;
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+        min-height: 90px;
+    }
+
+    .widget-content.active-widget {
+        display: flex !important;
+        justify-content: center;
+        gap: 20px; /* Más separación entre icono y texto */
+    }
+
+    .weather-temp {
+        font-size: 28px; /* Potencia en móvil */
+    }
+
+    .weather-icon, .weather-icon i {
+        font-size: 40px; /* Iconos grandes y legibles en móvil */
+    }
+}
