@@ -364,3 +364,204 @@ input[type="radio"] { accent-color: var(--color-principal); cursor: pointer; }
         font-size: 40px; /* Iconos grandes y legibles en móvil */
     }
 }
+/* =============================================================
+   7. CALENDARIO ESTILO APPLE
+   ============================================================= */
+
+/* Contenedor principal a pantalla completa */
+.full-screen-panel {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #fff;
+    z-index: 4000;
+    display: none; /* Se activa con JS */
+    flex-direction: column;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 20px 20px;
+    background: #fff;
+}
+
+.btn-back {
+    background: none; border: none;
+    color: var(--color-principal);
+    font-size: 17px; display: flex; align-items: center; gap: 5px;
+    cursor: pointer;
+}
+
+.panel-header h1 { font-size: 20px; font-weight: 700; color: #000; }
+
+/* Rejilla del Calendario */
+.calendar-container { padding: 0 20px; }
+
+.calendar-month-year {
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 20px; color: #000;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600; color: #8e8e93;
+    font-size: 13px; margin-bottom: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 18px; border-radius: 50%;
+    cursor: pointer; transition: 0.2s;
+}
+
+.calendar-day.today { color: var(--color-principal); font-weight: 800; }
+.calendar-day.has-event { background: #f2f2f7; font-weight: 600; }
+.calendar-day:active { background: #e5e5ea; }
+
+/* =============================================================
+   8. TARJETA DE EVENTO (LA QUE SALE DE ABAJO)
+   ============================================================= */
+
+.event-sheet {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    transform: translateY(100%); /* Escondida por defecto */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.event-sheet.active { transform: translateY(0); }
+
+.event-image-container {
+    position: relative;
+    width: 100%; height: 200px;
+    overflow: hidden;
+    border-radius: 30px 30px 0 0;
+}
+
+#event-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* EL DEGRADADO QUE DIBUJASTE (De transparente a blanco) */
+.event-image-overlay {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent 40%, #fff 95%);
+}
+
+.event-details {
+    padding: 0 25px 40px;
+    margin-top: -30px; /* Sube el texto sobre el degradado */
+    position: relative;
+    z-index: 2;
+}
+
+.event-details h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.event-details p { 
+    color: #666; font-size: 15px; 
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.event-details i { color: var(--color-principal); width: 18px; }
+
+/* Animación de entrada de página */
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+/* =============================================================
+   8. TARJETA DE EVENTO (CORREGIDA Y SIN CORTES)
+   ============================================================= */
+
+.event-sheet {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    /* Quitamos max-height fijo para evitar cortes */
+    background: #fff;
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    transform: translateY(100%); /* Escondida */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 4500; /* Aseguramos que esté por encima de todo */
+    
+    /* ESTO ES CLAVE: Añadimos padding arriba para la barrita gris */
+    padding-top: 15px; 
+    display: flex;
+    flex-direction: column;
+}
+
+.event-sheet.active { transform: translateY(0); }
+
+/* La barrita gris de agarre */
+.event-sheet .sheet-handle {
+    width: 40px; height: 5px;
+    background: #d1d1d6; /* Gris iOS más suave */
+    border-radius: 10px;
+    margin: 0 auto 15px; /* Separación con la foto */
+    flex-shrink: 0; /* Que no se encoja */
+}
+
+/* Contenedor de la foto */
+.event-image-container {
+    position: relative;
+    width: 100%; height: 180px; /* Un pelín más baja para dar aire */
+    overflow: hidden;
+    /* Redondeamos solo las esquinas de arriba de la foto */
+    border-radius: 20px 20px 0 0; 
+    margin: 0 15px; /* Separación lateral de la foto */
+    width: calc(100% - 30px); /* Ajuste de ancho por el margin */
+}
+
+#event-img { 
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+}
+
+/* EL DEGRADADO QUE DIBUJASTE (Hacia blanco) */
+.event-image-overlay {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 80%; /* degradado más largo */
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.9) 45%, #fff 100%);
+}
+
+/* Contenedor de los textos */
+.event-content {
+    /* Permitimos scroll interno si el texto es muy largo */
+    overflow-y: auto; 
+    padding-bottom: 30px; /* Espacio al final para que no se pegue abajo */
+}
+
+.event-details {
+    padding: 20px 25px; /* Padding equilibrado */
+    position: relative;
+    z-index: 2;
+    background: #fff; /* Aseguramos fondo blanco bajo el texto */
+}
+
+.event-details h3 { 
+    font-size: 20px; /* Un pelín más pequeño para que quepa en una línea */
+    font-weight: 700; margin-bottom: 12px; color: #000;
+}
+
+.event-details p { 
+    color: #3a3a3c; font-size: 15px; 
+    margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
+}
+
+.event-details i { color: var(--color-principal); font-size: 16px; width: 20px; text-align: center;}
