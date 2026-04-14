@@ -21,8 +21,8 @@
         <button class="tool-btn" onclick="toggleMenu('panel-menu')" title="Menú"> 
             <i class="fa-solid fa-bars"></i>
         </button>
-        <button class="tool-btn" onclick="toggleMenu('panel-capas')" title="Capas"> 
-            <i class="fa-solid fa-layer-group"></i>
+        <button class="tool-btn" onclick="abrirCalendario()" title="Calendario"> 
+            <i class="fa-solid fa-calendar-days"></i>
         </button>
         <button class="tool-btn" onclick="togglePantallaLimpia()" title="Despejar pantalla"> 
             <i class="fa-solid fa-eye-slash"></i>
@@ -39,7 +39,7 @@
         <nav aria-label="Navegación secundaria">
             <ul class="menu-list">
                 <li>
-                    <a href="hermandades.html">
+                    <a href="hermandades.html" onclick="document.getElementById('panel-menu').classList.remove('active')">
                         <span class="icon">⛪</span> <span data-key="nav_hermandades">Hermandades</span> 
                     </a>
                 </li>
@@ -50,33 +50,6 @@
                 </li>
             </ul>
         </nav>     
-    </aside>
-
-    <aside class="side-panel" id="panel-capas">
-        <h3 data-key="layers_title">Estilo del Mapa</h3> 
-
-        <fieldset class="map-style-group" style="border: none; padding: 0; margin: 0;">
-            <ul class="layers-list" style="list-style:none; padding: 0">
-                <li>
-                    <label class="style-option">
-                        <input type="radio" name="mapa" checked onclick="CambiarBaseMapa('claro')"> 
-                        <span data-key="style_light">Vista Clara</span>
-                    </label>
-                </li>
-                <li>
-                    <label class="style-option">
-                        <input type="radio" name="mapa" onclick="CambiarBaseMapa('oscuro')"> 
-                        <span data-key="style_dark">Vista Nocturna</span>
-                    </label>
-                </li>
-                <li>
-                    <label class="style-option">
-                        <input type="radio" name="mapa" onclick="CambiarBaseMapa('satelite')"> 
-                        <span data-key="style_satellite">Vista Satélite</span>
-                    </label>
-                </li>
-            </ul>
-        </fieldset>
     </aside>
 
     <section class="weather-card" aria-label="Información meteorológica y contacto">
@@ -140,9 +113,44 @@
         </div>
     </div>
 
+    <div id="panel-calendario" class="full-screen-panel">
+        <div class="panel-header">
+            <button class="btn-back" onclick="cerrarCalendario()">
+                <i class="fa-solid fa-chevron-left"></i> <span>Volver</span>
+            </button>
+            <h1 data-key="titulo-calendario">Calendario</h1>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="calendar-container">
+            <div class="calendar-month-year">
+                <span id="month-name">Mayo</span> <span id="year-name">2026</span>
+            </div>
+            <div class="calendar-weekdays">
+                <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+
+        <div id="event-sheet" class="event-sheet">
+            <div class="sheet-handle"></div>
+            <div class="event-content">
+                <div class="event-image-container">
+                    <img src="img/sja.jpg" id="event-img" alt="Evento">
+                    <div class="event-image-overlay"></div>
+                </div>
+                <div class="event-details">
+                    <h3 id="event-title">San José Artesano - 1 de Mayo</h3>
+                    <p><i class="fa-regular fa-clock"></i> <span id="event-hours">18:00 - 23:45</span></p>
+                    <p><i class="fa-solid fa-location-dot"></i> <span id="event-place">Iglesia Mayor</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/lang.js"></script> 
-    <script src="js/settings.js"></script> <script src="js/map.js"></script>
+    <script src="js/settings.js"></script> 
+    <script src="js/calendar.js"></script> <script src="js/map.js"></script>
     <script src="js/app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
