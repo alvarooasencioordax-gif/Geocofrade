@@ -1,567 +1,79 @@
-/* =============================================================
-   1. VARIABLES Y CONFIGURACIÓN GLOBAL
-   ============================================================= */
-:root {
-    --color-principal: #734960; 
-    --color-fondo: #f4f4f9;
-    --sombra: 0 8px 32px rgba(0,0,0,0.2);
-    --glass: rgba(255, 255, 255, 0.9);
-    --texto-oscuro: #2d2d2d;
-    --texto-suave: #555;
-}
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
 }
 
-body {
-    height: 100vh;
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
     width: 100%;
     overflow: hidden;
-    background-color: var(--color-fondo);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-#map {
+#map{
     height: 100vh;
-    width: 100vw;
-    z-index: 1;
+    width:100%;
 }
-
-/* =============================================================
-   2. ELEMENTOS DE LA INTERFAZ (UI)
-   ============================================================= */
-
-.ayto-logo {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    background: var(--glass);
-    padding: 8px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--sombra);
-    border: 1px solid rgba(255,255,255,0.4);
-}
-
-.ayto-logo img {
-    height: 45px;
-    width: auto;
-    display: block;
-}
-
-.left-tools {
-    position: absolute;
+nav {
+    position: absolute; 
     top: 20px;
     left: 20px;
-    z-index: 1000;
-    display: flex;
+    z-index:1000;
+    display: flex; 
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
-
 .tool-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: var(--color-principal);
     cursor: pointer;
+    height:50px;
+    width: 50px;
+    border-radius: 12.5px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    background-color: rgba(255, 255, 255, .6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: var(--sombra);
-    font-size: 18px;
-    transition: all 0.2s ease;
+
 }
-
-.tool-btn:hover {
-    transform: scale(1.1);
-    background: white;
+.tool-btn i{
+    color: #734960;
+    font-size: 17.5px;
 }
-
-.return-btn {
-    display: none;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 1001;
-}
-
-.ui-hidden .return-btn { display: flex !important; }
-.ui-hidden .left-tools, .ui-hidden .ayto-logo, .ui-hidden .weather-card, .ui-hidden .side-panel {
-    display: none !important;
-}
-
-/* =============================================================
-   3. PANELES LATERALES (Menú y Capas)
-   ============================================================= */
-.side-panel {
-    position: absolute;
-    top: 20px;
-    left: 80px;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: var(--sombra);
-    z-index: 999;
-    border: 1px solid rgba(255,255,255,0.4);
-    min-width: 240px;
-    display: none; 
-}
-
-.side-panel.active { display: block; }
-
-.side-panel h3 {
-    font-size: 14px;
-    color: var(--color-principal);
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.menu-list li, .layers-list li {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-}
-
-.menu-list a, .layers-list label {
-    text-decoration: none;
-    color: var(--texto-oscuro);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.style-option { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-input[type="radio"] { accent-color: var(--color-principal); cursor: pointer; }
-
-/* =============================================================
-   4. WIDGETS (Clima y Redes Sociales) - RESTAURADO
-   ============================================================= */
-.weather-icon {
-    margin-right: 20px !important; /* Ajusta este número a tu gusto */
-}
-
-.weather-data p {
-    margin-bottom: 4px !important;
-}
-
-   .weather-card {
+section {
     position: absolute;
     bottom: 20px;
-    right: 20px;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    padding: 18px; /* Un poco más de aire */
-    border-radius: 20px;
-    box-shadow: var(--sombra);
-    z-index: 1000;
-    min-width: 220px;
-    border: 1px solid rgba(255,255,255,0.3);
+    height: 80px;
+    width: 90%;
+    left: 5%;
+    z-index: 2000;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, .6); 
+    backdrop-filter: blur(10px); 
+    border-radius: 20px; 
+    border: 1px solid rgba(255, 255, 255, .9); 
 }
-
-.weather-temp { 
-    font-size: 22px; /* Más grande */
-    font-weight: 600; /* BOLD restaurado */
-    color: var(--texto-oscuro); 
-    line-height: 1; 
-}
-
-.weather-icon {
-    font-size: 32px; /* Iconos más grandes */
-}
-
-/* Para los iconos de FontAwesome (LI e IG) */
-.weather-icon i {
-    font-size: 32px;
-}
-
-.widget-content {
-    display: none;
-    align-items: center;
-    gap: 15px;
-}
-
-.widget-content.active-widget {
+#weather-card{ 
     display: flex;
-    animation: giroEntrada 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* =============================================================
-   5. BOTTOM SHEET (Nuevos Ajustes)
-   ============================================================= */
-/* =============================================================
-   5. BOTTOM SHEET (Ajustes Estilo Glass Claro)
-   ============================================================= */
-
-#panel-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.3); /* Overlay más sutil */
-    z-index: 2500;
-    display: none;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-}
-
-.bottom-sheet {
-    position: fixed;
-    bottom: 0; left: 0;
+    justify-content: center;
+    align-items: center;
+    padding-left:30px;
+    gap:15px;
     width: 100%;
-    max-height: 80vh;
-    /* FONDO CLARO TRASLÚCIDO */
-    background: rgba(255, 255, 255, 0.92); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    
-    border-radius: 25px 25px 0 0;
-    z-index: 3000;
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    color: #2d2d2d; /* Texto oscuro para fondo claro */
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    height:100%;
 }
-
-.bottom-sheet.active { transform: translateY(0); }
-
-.sheet-header {
-    padding: 15px;
-    text-align: center;
-    position: relative;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+#w-data{
+    display:flex;
+    flex-direction: column;
 }
-
-.sheet-handle {
-    width: 36px; height: 5px;
-    background: rgba(0,0,0,0.15); /* Handle más suave */
-    border-radius: 10px;
-    margin: 0 auto 10px;
+#w-icon{
+  font-size: 40px;
 }
-
-.sheet-header h2 {
-    color: #2d2d2d;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.sheet-close {
-    position: absolute; right: 20px; top: 18px;
-    background: rgba(0,0,0,0.05); 
-    border: none;
-    color: #555; width: 30px; height: 30px;
-    border-radius: 50%; cursor: pointer;
-    display: flex; justify-content: center; align-items: center;
-    transition: background 0.2s;
-}
-
-.sheet-close:hover { background: rgba(0,0,0,0.1); }
-
-.sheet-content {
-    padding: 10px 16px 40px;
-    overflow-y: auto;
-    max-height: 70vh;
-}
-
-/* --- Estilos Internos de Ajustes --- */
-
-.section-title {
-    color: var(--color-principal); /* Tu morado */
-    font-size: 12px;
+#w-temp{
+    font-size:25px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 25px 0 8px 15px;
-    opacity: 0.8;
 }
-
-.ios-group {
-    background: white; /* Tarjetas blancas puras */
-    border-radius: 14px;
-    overflow: hidden;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    border: 1px solid rgba(0,0,0,0.02);
-}
-
-.ios-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 18px;
-    border-bottom: 1px solid #f2f2f7;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.ios-item:last-child { border-bottom: none; }
-
-.ios-item span { 
-    font-size: 16px; 
-    color: #2d2d2d; 
-    font-weight: 500;
-}
-
-/* Efecto de pulsación más natural en claro */
-.ios-item:active { background-color: #f2f2f7; }
-
-.check-icon, .check-icon-lang {
-    display: none;
-    color: var(--color-principal); /* Check en morado */
-    font-size: 16px;
-}
-
-.is-selected .check-icon, 
-.is-selected-lang .check-icon-lang {
-    display: block;
-}
-
-/* Botón peligro con estilo iOS claro */
-.item-danger {
-    margin-top: 1px;
-}
-
-.item-danger span { color: #ff453a !important; font-weight: 500; text-align: center; width: 100%; }
-
-/* =============================================================
-   6. RESPONSIVE (MÓVIL) - RESTAURADO
-   ============================================================= */
-@media (max-width: 600px) {
-    .weather-card {
-        right: 50% !important;
-        left: 50% !important;
-        bottom: 30px;
-        transform: translateX(-50%); 
-        width: 90%; /* Un pelín más ancho en móvil */
-        padding: 15px 20px;
-        display: flex;
-        justify-content: center; 
-        align-items: center;
-        min-height: 90px;
-    }
-
-    .widget-content.active-widget {
-        display: flex !important;
-        justify-content: center;
-        gap: 20px; /* Más separación entre icono y texto */
-    }
-
-    .weather-temp {
-        font-size: 28px; /* Potencia en móvil */
-    }
-
-    .weather-icon, .weather-icon i {
-        font-size: 40px; /* Iconos grandes y legibles en móvil */
-    }
-}
-/* =============================================================
-   7. CALENDARIO ESTILO APPLE
-   ============================================================= */
-
-/* Contenedor principal a pantalla completa */
-.full-screen-panel {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #fff;
-    z-index: 4000;
-    display: none; /* Se activa con JS */
-    flex-direction: column;
-    animation: slideInRight 0.3s ease-out;
-}
-
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 50px 20px 20px;
-    background: #fff;
-}
-
-.btn-back {
-    background: none; border: none;
-    color: var(--color-principal);
-    font-size: 17px; display: flex; align-items: center; gap: 5px;
-    cursor: pointer;
-}
-
-.panel-header h1 { font-size: 20px; font-weight: 700; color: #000; }
-
-/* Rejilla del Calendario */
-.calendar-container { padding: 0 20px; }
-
-.calendar-month-year {
-    font-size: 22px; font-weight: 700;
-    margin-bottom: 20px; color: #000;
-}
-
-.calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-weight: 600; color: #8e8e93;
-    font-size: 13px; margin-bottom: 10px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-}
-
-.calendar-day {
-    aspect-ratio: 1;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 18px; border-radius: 50%;
-    cursor: pointer; transition: 0.2s;
-}
-
-.calendar-day.today { color: var(--color-principal); font-weight: 800; }
-.calendar-day.has-event { background: #f2f2f7; font-weight: 600; }
-.calendar-day:active { background: #e5e5ea; }
-
-/* =============================================================
-   8. TARJETA DE EVENTO (LA QUE SALE DE ABAJO)
-   ============================================================= */
-
-.event-sheet {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%;
-    background: #fff;
-    border-radius: 30px 30px 0 0;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-    transform: translateY(100%); /* Escondida por defecto */
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.event-sheet.active { transform: translateY(0); }
-
-.event-image-container {
-    position: relative;
-    width: 100%; height: 200px;
-    overflow: hidden;
-    border-radius: 30px 30px 0 0;
-}
-
-#event-img { width: 100%; height: 100%; object-fit: cover; }
-
-/* EL DEGRADADO QUE DIBUJASTE (De transparente a blanco) */
-.event-image-overlay {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(to bottom, transparent 40%, #fff 95%);
-}
-
-.event-details {
-    padding: 0 25px 40px;
-    margin-top: -30px; /* Sube el texto sobre el degradado */
-    position: relative;
-    z-index: 2;
-}
-
-.event-details h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-.event-details p { 
-    color: #666; font-size: 15px; 
-    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
-}
-.event-details i { color: var(--color-principal); width: 18px; }
-
-/* Animación de entrada de página */
-@keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-}
-/* =============================================================
-   8. TARJETA DE EVENTO (CORREGIDA Y SIN CORTES)
-   ============================================================= */
-
-.event-sheet {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%;
-    /* Quitamos max-height fijo para evitar cortes */
-    background: #fff;
-    border-radius: 30px 30px 0 0;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-    transform: translateY(100%); /* Escondida */
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 4500; /* Aseguramos que esté por encima de todo */
-    
-    /* ESTO ES CLAVE: Añadimos padding arriba para la barrita gris */
-    padding-top: 15px; 
-    display: flex;
-    flex-direction: column;
-}
-
-.event-sheet.active { transform: translateY(0); }
-
-/* La barrita gris de agarre */
-.event-sheet .sheet-handle {
-    width: 40px; height: 5px;
-    background: #d1d1d6; /* Gris iOS más suave */
-    border-radius: 10px;
-    margin: 0 auto 15px; /* Separación con la foto */
-    flex-shrink: 0; /* Que no se encoja */
-}
-
-/* Contenedor de la foto */
-.event-image-container {
-    position: relative;
-    width: 100%; height: 180px; /* Un pelín más baja para dar aire */
-    overflow: hidden;
-    /* Redondeamos solo las esquinas de arriba de la foto */
-    border-radius: 20px 20px 0 0; 
-    margin: 0 15px; /* Separación lateral de la foto */
-    width: calc(100% - 30px); /* Ajuste de ancho por el margin */
-}
-
-#event-img { 
-    width: 100%; height: 100%; 
-    object-fit: cover; 
-}
-
-/* EL DEGRADADO QUE DIBUJASTE (Hacia blanco) */
-.event-image-overlay {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%; height: 80%; /* degradado más largo */
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.9) 45%, #fff 100%);
-}
-
-/* Contenedor de los textos */
-.event-content {
-    /* Permitimos scroll interno si el texto es muy largo */
-    overflow-y: auto; 
-    padding-bottom: 30px; /* Espacio al final para que no se pegue abajo */
-}
-
-.event-details {
-    padding: 20px 25px; /* Padding equilibrado */
-    position: relative;
-    z-index: 2;
-    background: #fff; /* Aseguramos fondo blanco bajo el texto */
-}
-
-.event-details h3 { 
-    font-size: 20px; /* Un pelín más pequeño para que quepa en una línea */
-    font-weight: 700; margin-bottom: 12px; color: #000;
-}
-
-.event-details p { 
-    color: #3a3a3c; font-size: 15px; 
-    margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
-}
-
-.event-details i { color: var(--color-principal); font-size: 16px; width: 20px; text-align: center;}
