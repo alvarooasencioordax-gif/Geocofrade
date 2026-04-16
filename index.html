@@ -2,164 +2,63 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoCofrade SF - Live 2026</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Geocofrade - Localizador de pasos de Semana Santa en San Fernando</title>
     <link rel="manifest" href="manifest.json">
+    <meta  name="theme-color" content="#800020">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <header class="ayto-logo">
-        <img src="img/aytosf.png" alt="Ayuntamiento de San Fernando"> 
-    </header>
-
-    <nav class="left-tools" id="ui-tools">
-        <button class="tool-btn" onclick="toggleMenu('panel-menu')" title="Menú"> 
-            <i class="fa-solid fa-bars"></i>
+    <main id="map"></main>
+    <nav>
+        <button class="tool-btn" onclick="togglemenu('panel-principal')" title="Menú">
+            <i class="fa-solid fa-bars-staggered"></i>
         </button>
-        <button class="tool-btn" onclick="abrirCalendario()" title="Calendario"> 
-            <i class="fa-solid fa-calendar-days"></i>
-        </button>
-        <button class="tool-btn" onclick="togglePantallaLimpia()" title="Despejar pantalla"> 
-            <i class="fa-solid fa-eye-slash"></i>
+        <button class="tool-btn" onclick="cambiarModo()" title="Cambiar vista">
+            <i class="fa-solid fa-sun"></i>
         </button>
     </nav>
 
-    <button class="tool-btn return-btn" onclick="togglePantallaLimpia()" title="Mostrar Interfaz"> 
-        <i class="fa-solid fa-eye"></i>
-    </button>
-
-    <aside class="side-panel" id="panel-menu">
-        <h3 data-key="menu_title">Menú Principal</h3> 
-
-        <nav aria-label="Navegación secundaria">
-            <ul class="menu-list">
-                <li>
-                    <a href="hermandades.html" onclick="document.getElementById('panel-menu').classList.remove('active')">
-                        <span class="icon">⛪</span> <span data-key="nav_hermandades">Hermandades</span> 
-                    </a>
-                </li>
-                 <li>
-                    <a href="javascript:void(0)" onclick="abrirAjustes()">
-                        <span class="icon">⚙️</span> <span data-key="nav_settings">Ajustes</span> 
-                    </a>
-                </li>
-            </ul>
-        </nav>     
+    <aside id="panel-principal">
+        <button class="close-btn" onclick="togglemenu('panel-principal')">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <ul>
+            <li>
+                <button class="menu-item" onclick="mostrarSeccion('hermandades')">
+                    <i class="fa-solid fa-church"></i> Hermandades
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" onclick="mostrarSeccion('calendario')">
+                    <i class="fa-solid fa-calendar-days"></i> Calendario
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" onclick="mostrarSeccion('ajustes')">
+                    <i class="fa-solid fa-gear"></i> Ajustes
+                </button>
+            </li>
+        </ul>
     </aside>
 
-    <section class="weather-card" aria-label="Información meteorológica y contacto">
-        <article id="widget-weather" class="widget-content active-widget"> 
-            <div class="weather-icon" id="w-icon">🌦️</div>
-            <div class="weather-data">
-                <p class="weather-temp" id="w-temp">20°C</p>
-                <div class="weather-details">
-                    <span class="detail-item">💨 <span id="w-viento">15 km/h</span></span>
-                    <span class="detail-item">🌧️ <span id="w-lluvia">5%</span></span>
+    <section class="cards">
+        <article id="weather-card">
+            <div id="w-icon">🌦️</div>
+            <div id="w-data">
+                <p id="w-temp">20ºC</p>
+                <div id="w-details">
+                    <span class="detail-weather">💨 <span id="w-viento">15 Km/h</span></span>
+                    <span class="detail-weather">🌧️ <span id="w-lluvia">10%</span></span>
                 </div>
             </div>
         </article>
-
-        <article id="widget-linkedin" class="widget-content"> 
-            <a href="https://linkedin.com/in/alvaroasencio" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
-                <div class="weather-icon" style="color: #0A66C2;"><i class="fa-brands fa-linkedin"></i></div>
-                <div class="weather-data">
-                    <p data-key="widget_dev" style="margin: 0; font-size: 14px; font-weight: 600;">Desarrollo web</p>
-                    <p style="margin: 0; font-size: 12px;">@alvaroasencio</p>
-                </div>
-            </a>
-        </article>
-
-        <article id="widget-instagram" class="widget-content"> 
-            <a href="https://instagram.com/alvaroasencioo" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
-                <div class="weather-icon" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></div>
-                <div class="weather-data">
-                    <p data-key="widget_ig" style="margin: 0; font-size: 14px; font-weight: 600;">Sígueme en IG</p>
-                    <p style="margin: 0; font-size: 12px;">@alvaroasencioo</p>
-                </div>
-            </a>
-        </article>
-    </section>  
-
-    <main id="map"></main>
-
-    <div id="panel-overlay" onclick="cerrarAjustes()"></div>
-    <div id="sheet-ajustes" class="bottom-sheet">
-        <div class="sheet-header">
-            <div class="sheet-handle"></div>
-            <h2 data-key="titulo-ajustes">Ajustes</h2>
-        </div>
-        <div class="sheet-content">
-            <p class="section-title" data-key="seccion-idioma">Idioma</p>
-            <div class="ios-group">
-                <div class="ios-item" onclick="seleccionarIdioma('es')">
-                    <span>Español</span>
-                    <i class="fa-solid fa-check check-icon-lang" id="check-es"></i>
-                </div>
-                <div class="ios-item" onclick="seleccionarIdioma('en')">
-                    <span>English</span>
-                    <i class="fa-solid fa-check check-icon-lang" id="check-en"></i>
-                </div>
-            </div>
-            <div class="ios-group" style="margin-top: 20px;">
-                <div class="ios-item item-danger" onclick="reportarIncidencia()">
-                    <span class="text-centered" data-key="btn-reportar">Reportar incidencia</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="panel-calendario" class="full-screen-panel">
-        <div class="panel-header">
-            <button class="btn-back" onclick="cerrarCalendario()">
-                <i class="fa-solid fa-chevron-left"></i> <span>Volver</span>
-            </button>
-            <h1 data-key="titulo-calendario">Calendario</h1>
-            <div style="width: 50px;"></div>
-        </div>
-        <div class="calendar-container">
-            <div class="calendar-month-year">
-                <span id="month-name">Mayo</span> <span id="year-name">2026</span>
-            </div>
-            <div class="calendar-weekdays">
-                <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
-            </div>
-            <div id="calendar-grid" class="calendar-grid"></div>
-        </div>
-
-        <div id="event-sheet" class="event-sheet">
-            <div class="sheet-handle"></div>
-            <div class="event-content">
-                <div class="event-image-container">
-                    <img src="img/sja.webp" id="event-img" alt="Evento">
-                    <div class="event-image-overlay"></div>
-                </div>
-                <div class="event-details">
-                    <h3 id="event-title">San José Artesano - 1 de Mayo</h3>
-                    <p><i class="fa-regular fa-clock"></i> <span id="event-hours">18:00 - 23:45</span></p>
-                    <p><i class="fa-solid fa-location-dot"></i> <span id="event-place">Iglesia Mayor</span></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/lang.js"></script> 
-    <script src="js/settings.js"></script> 
-    <script src="js/calendar.js"></script> <script src="js/map.js"></script>
-    <script src="js/app.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registrado correctamente', reg))
-                .catch(err => console.warn('Error al registrar el Service Worker', err));
-            });
-        }
-    </script>
+    <script src="js/map.js"></script>
 </body>
 </html>
